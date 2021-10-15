@@ -45,5 +45,6 @@ workflows:
       - build:  
           post-steps:
             - jira/notify 
+            - run: cat /tmp/jira-status.json            
             
             #test...
