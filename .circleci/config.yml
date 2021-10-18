@@ -296,6 +296,38 @@ commands:
 
 
 jobs:
+  heroku_test:
+    machine: true
+    steps:
+      - checkout
+
+
+          
+  ios-staging:
+    macos:
+      xcode: 12.4.0
+    shell: /bin/bash --login -o pipefail
+    steps:
+      - checkout
+#       - run : echo insecure >> $HOME/.curlrc
+#       - node/install:
+#           node-version: '12.18.3'
+#           install-yarn: true
+#           yarn-version: '1.22.10'      
+ 
+  unit-test:
+    executor:
+      name: android/android
+      sdk-version: '30'
+    resource_class: large
+
+    steps:
+      - checkout 
+          
+
+
+
+
 
   build:
     docker:
@@ -305,7 +337,6 @@ jobs:
 #           password: $DOCKERHUB_PASSWORD       
     steps:
       - checkout
-      - jira_test
       
 
 
@@ -313,13 +344,47 @@ jobs:
       
         
 
+  test:
+    docker:
+      - image: circleci/node:12.20.2
       
+    steps:
+      - run : echo "hello world"  
+#       - run : echo 'export RUN_TEST=yes' >> $BASH_ENV
+      - jira_test
+                 
+      - run: 
+          command: | 
+                  if [ -n "${RUN_TEST}" ]; then
+                    echo "RUN_TEST is set"
+                  fi
+      - run: 
+          command: | 
+                  if [ $TEST_VAR = "testvar" ]; then
+                    echo "they match"
+                  else
+                    echo "try again"
+                    echo $TEST_VAR
+                  fi
+            
+      - run: 
+          command: | 
+                  if [ $MY_ENV_VAR = "password" ]; then
+                    echo "they match"
+                  else
+                    echo "try again"
+                    echo $MY_ENV_VAR
+                  fi            
 # # #
 workflows:
-
+    build_and_push:
+      jobs:
+        - build
+        - heroku_test
+        - unit-test
+        - ios-staging
     test: 
       jobs:
         - build
-    
-
+        - test    
 
