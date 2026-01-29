@@ -48,5 +48,4 @@ workflows:
             - run: cat /tmp/jira-status.json  
             - run : cat /tmp/job_info.json
 
-            
-            #test...
+
